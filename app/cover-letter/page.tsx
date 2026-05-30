@@ -17,6 +17,7 @@ export default function CoverLetterPage() {
     setLoading(true);
     setResult("");
     try {
+      console.log("aceler")
       const res = await fetch("/api/cover-letter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

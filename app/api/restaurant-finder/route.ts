@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { trackedAI } from "@/lib/tracker";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || "mock-key",
+const groq = new OpenAI({
+  apiKey: process.env.NEXT_PUBLIC_GROQ_API_KEY || "mock-key",
+  baseURL: "https://api.groq.com/openai/v1",
 });
 
 export async function POST(req: Request) {
@@ -24,16 +25,16 @@ ${preferences}`;
       feature: "restaurant-finder",
       userId: "demo-user",
       run: async () => {
-        return await anthropic.messages.create({
-          model: "claude-sonnet-4-6",
+        return await groq.chat.completions.create({
+          model: "llama-3.3-70b-versatile",
           max_tokens: 1000,
-          tools: [{ type: "web_search_20250305", name: "web_search" }] as any,
           messages: [{ role: "user", content: prompt }],
         });
       },
     });
 
-    const recommendations = response.content[0]?.type === 'text' ? response.content[0].text : "No content generated";
+    const recommendations =
+      response.choices[0]?.message?.content || "No content generated";
 
     return NextResponse.json({ recommendations });
   } catch (error: any) {

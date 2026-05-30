@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { trackedAI } from "@/lib/tracker";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || "mock-key",
+const groq = new OpenAI({
+  apiKey: process.env.NEXT_PUBLIC_GROQ_API_KEY || "mock-key",
+  baseURL: "https://api.groq.com/openai/v1",
 });
 
 export async function POST(req: Request) {
@@ -18,15 +19,16 @@ ${experience}`;
       feature: "cover-letter-generator",
       userId: "demo-user",
       run: async () => {
-        return await openai.chat.completions.create({
-          model: "gpt-4o",
+        return await groq.chat.completions.create({
+          model: "llama-3.3-70b-versatile",
           max_tokens: 800,
           messages: [{ role: "user", content: prompt }],
         });
       },
     });
 
-    const coverLetter = response.choices[0]?.message?.content || "No content generated";
+    const coverLetter =
+      response.choices[0]?.message?.content || "No content generated";
 
     return NextResponse.json({ coverLetter });
   } catch (error: any) {
